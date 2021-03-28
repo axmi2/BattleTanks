@@ -41,3 +41,18 @@ void ATankAIController::BeginPlay()
 
 
 }
+
+void ATankAIController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	//UE_LOG(LogTemp, Warning, TEXT("Tick tick tick"));
+	if (GetPlayerTank()) {
+		//TO Move towards the player
+
+		//Aim towards the player
+		GetControlledTank()->AimAt(GetPlayerTank()->GetActorLocation());
+
+
+		//Fire when ready
+	}
+}
