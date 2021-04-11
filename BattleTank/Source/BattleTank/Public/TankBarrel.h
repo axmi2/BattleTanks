@@ -21,10 +21,10 @@ public:
 	void Elevate(float DegreesPerSecond);
 
 private:
-	UPROPERTY(EditAnywhere, Category=SETUP)
+	UPROPERTY(EditDefaultsOnly, Category=SETUP)
 	float MaxDegreesPerSecond = 10.; // Sensible max value
-	UPROPERTY(EditAnywhere, Category = SETUP)
+	UPROPERTY(EditDefaultsOnly, Category = SETUP)
 	float MaxElevation = 20.; //Sensible Max Value
-	UPROPERTY(EditAnywhere, Category = SETUP)
+	UPROPERTY(EditDefaultsOnly, Category = SETUP)
 	float MinElevation = -2.; //Sensible Min Value to prevent self collision
 };
