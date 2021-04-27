@@ -4,6 +4,7 @@
 #include "TankAimingComponent.h"
 #include "TankBarrel.h"
 #include "TankTurret.h"
+#include "Projectile.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -17,34 +18,11 @@ UTankAimingComponent::UTankAimingComponent()
 	// ...
 }
 
-void UTankAimingComponent::SetBarrelReference(UTankBarrel* BarrelToSet) {
-	
-	if (BarrelToSet) {
-		Barrel = BarrelToSet;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("NoBarrelSet"));
-	}
-	
-}
 
-void UTankAimingComponent::SetTurretReference(UTankTurret* TurretToSet) {
-
-	if (TurretToSet) {
-		Turret = TurretToSet;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("NoTurretSet"));
-	}
-
-}
-
-void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed) {
+void UTankAimingComponent::AimAt(FVector HitLocation) {
 	auto Time = GetWorld()->GetTimeSeconds();
-	if (!Barrel) { return; }
-	if (!Turret) { return; }
+	if (!ensure(Barrel)) { return; }
+	if (!ensure(Turret)) { return; }
 	auto OurTankName = GetOwner()->GetName();
 	auto BarrelLocation = Barrel->GetComponentLocation();
 	FVector OutLaunchVelocity{ 0 };
@@ -82,4 +60,35 @@ void UTankAimingComponent::MoveTurret(FVector AimDirection) {
 
 	Turret->RotateTurret(DeltaRotator.Yaw);
 	
+}
+
+
+void UTankAimingComponent::Initialise_Aiming(UTankBarrel* BarrelToSet, UTankTurret* TurretToSet) {
+
+	Barrel = BarrelToSet;
+	Turret = TurretToSet;
+}
+
+void UTankAimingComponent::Fire() {
+
+
+	if (!ensure(Barrel)) { return; }
+	
+	UE_LOG(LogTemp, Warning, TEXT("Called Fire"));
+	bool isReloaded = (GetWorld()->GetTimeSeconds() - LastFireTime) > ReloadTimeInSeconds;
+
+	if (isReloaded)
+	{
+
+
+		auto Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileBlueprint, Barrel->GetSocketLocation(FName("Projectile")), Barrel->GetSocketRotation(FName("Projectile")));
+		if (!ensure(Projectile)) { return; }
+		Projectile->LaunchProjectile(LaunchSpeed);
+
+		LastFireTime = GetWorld()->GetTimeSeconds();
+	}
+
+
+
+
 }

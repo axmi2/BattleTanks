@@ -3,13 +3,16 @@
 //#include <DrawDebugHelpers.h>
 //#include "Math/Color.h"
 #include "TankPlayerController.h"
+#include "TankAimingComponent.h"
 
 void ATankPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	auto ControlledTank = GetControlledTank();
-
-	if (!ControlledTank)
+	auto ControlledTank = GetPawn();
+	auto AimingComponent = ControlledTank->FindComponentByClass<UTankAimingComponent>();
+	if(ensure(AimingComponent)){ FoundAimingComponent(AimingComponent); }
+	else { UE_LOG(LogTemp, Error, TEXT("DONKEY No Aiming Component found")); }
+	if (!ensure (ControlledTank))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Player Controller not possesing a tank"));
 	}
@@ -30,24 +33,19 @@ void ATankPlayerController::BeginPlay()
 
 
 
-
-ATank* ATankPlayerController::GetControlledTank() const {
-	
-	
-	
-	return Cast<ATank>(GetPawn());
-}
-
 void ATankPlayerController::AimTowardsCrosshair() {
-	if (!GetControlledTank()) {
+	
+	auto ControlledTank = GetPawn();
+	auto AimingComponent = ControlledTank->FindComponentByClass<UTankAimingComponent>();
+
+	if (!ensure(AimingComponent)) {
 		return;
 	}
-
 	FVector HitLocation; //Out Parameter
 	if (GetSightRayHitLocation(HitLocation)) {
 		//UE_LOG(LogTemp, Warning, TEXT("Hit Location: %s"), *HitLocation.ToString());
-
-		GetControlledTank()->AimAt(HitLocation);
+		
+		AimingComponent->AimAt(HitLocation);
 	}
 	
 }
